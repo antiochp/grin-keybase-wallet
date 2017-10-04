@@ -1,0 +1,26 @@
+name: grin-keybase-wallet
+version: "0,1"
+author: Antioch Peverell
+about: Grin Keybase Wallet
+# args:
+#     - config:
+#         short: c
+#         long: config
+#         value_name: FILE
+#         help: Sets a custom config file
+#         takes_value: true
+#     - INPUT:
+#         help: Sets the input file to use
+#         required: true
+#         index: 1
+#     - verbose:
+#         short: v
+#         multiple: true
+#         help: Sets the level of verbosity
+subcommands:
+    - test:
+        about: controls testing features
+        args:
+            - debug:
+                short: d
+                help: print debug information
