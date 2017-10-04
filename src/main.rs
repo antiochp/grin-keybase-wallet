@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate clap;
 use clap::App;
+use std::process::Command;
+
 
 fn main() {
 	let yaml = load_yaml!("cli.yml");
@@ -12,6 +14,20 @@ fn main() {
 
 		let msg = matches.value_of("MESSAGE").unwrap();
 		println!("*** message is - {:?}", msg);
+
+		if recipient != "antiochp" {
+			panic!("*** only allowed to send to antiochp for now... (for safety reasons...)");
+		}
+
+		let output = Command::new("keybase")
+			.arg("chat")
+			.arg("send")
+			.arg(recipient)
+			.arg(msg)
+			.output()
+			.expect("failed to run keybase");
+
+		println!("{:?}", output)
 	}
 
 
