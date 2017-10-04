@@ -67,5 +67,9 @@ Vagrant.configure("2") do |config|
 		sudo apt-get update
 		sudo apt-get install -y build-essential cmake
 		curl https://sh.rustup.rs -sSf | sh -s -- -y
+		curl -O https://prerelease.keybase.io/keybase_amd64.deb
+		sudo dpkg -i keybase_amd64.deb
+		sudo apt-get install -f -y
+		run_keybase
 	SHELL
 end
