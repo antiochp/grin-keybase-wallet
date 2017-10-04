@@ -1,5 +1,5 @@
 name: grin-keybase-wallet
-version: "0,1"
+version: "0.1"
 author: Antioch Peverell
 about: Grin Keybase Wallet
 # args:
@@ -18,9 +18,14 @@ about: Grin Keybase Wallet
 #         multiple: true
 #         help: Sets the level of verbosity
 subcommands:
-    - test:
-        about: controls testing features
+    - send:
+        about: sends a chat message
         args:
-            - debug:
-                short: d
-                help: print debug information
+            - RECIPIENT:
+                help: who to send to
+                required: true
+                index: 1
+            - MESSAGE:
+                help: the message to send
+                required: true
+                index: 2
