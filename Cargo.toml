@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["antiochp <30642645+antiochp@users.noreply.github.com>"]
 
 [dependencies]
+glob = "0.2"
 time = "0.1"
 clap = {version = "2.19", features = ["yaml"]}
 grin_keychain = { git = "https://github.com/antiochp/grin" }

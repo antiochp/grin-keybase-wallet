@@ -1,16 +1,24 @@
 #[macro_use]
 extern crate clap;
 extern crate time;
+extern crate glob;
 
 use clap::App;
 use std::error::Error;
 use std::io::prelude::*;
 use std::fs::File;
 use std::path::Path;
+use glob::glob;
+
 
 fn main() {
 	let yaml = load_yaml!("cli.yml");
 	let matches = App::from_yaml(yaml).get_matches();
+
+	if let Some(matches) = matches.subcommand_matches("receive") {
+		let recipient = "antiochp";
+		poll_for_files(recipient);
+	}
 
 	if let Some(matches) = matches.subcommand_matches("send") {
 		let sender = "alt_antiochp";
@@ -26,25 +34,6 @@ fn main() {
 		}
 
 		write_txn(sender, recipient);
-
-		// chat is basically a non-starter
-		// we would need to use attachments
-		// and at that point we may as well interact directly with kbfs
-		// and gain the additional flexibility of dir structure etc.
-
-		// so write a file to
-		// /keybase/private/<from>,<recipient>/grinbox_<recipient>/<timestamp>_foo_txn
-
-
-		// let output = Command::new("keybase")
-		// 	.arg("chat")
-		// 	.arg("send")
-		// 	.arg(recipient)
-		// 	.arg(msg)
-		// 	.output()
-		// 	.expect("failed to run keybase");
-
-		// println!("{:?}", output)
 	}
 }
 
@@ -63,7 +52,6 @@ fn write_txn(sender: &str, recipient: &str) {
 		Ok(file) => file,
 	};
 
-	// Write the `LOREM_IPSUM` string to `file`, returns `io::Result<()>`
 	match file.write_all("this is not json".as_bytes()) {
 		Err(why) => {
 			panic!("couldn't write to {}: {}", display, why.description())
@@ -72,6 +60,15 @@ fn write_txn(sender: &str, recipient: &str) {
 	}
 }
 
-fn poll_for_messages() {
-
+fn poll_for_files(recipient: &str) {
+	let pattern = format!("/keybase/private/{},*/grinbox_{}/*_txn.json", recipient, recipient);
+	for entry in glob(&pattern).expect("Failed to read glob pattern") {
+		match entry {
+			Ok(path) => {
+				println!("{:?}", path.display());
+				
+			},
+			Err(e) => println!("{:?}", e),
+		}
+	}
 }

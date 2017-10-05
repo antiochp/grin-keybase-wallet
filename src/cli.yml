@@ -18,8 +18,10 @@ about: Grin Keybase Wallet
 #         multiple: true
 #         help: Sets the level of verbosity
 subcommands:
+    - receive:
+        about: receives txns via kbfs
     - send:
-        about: sends a chat message
+        about: sends a txn via kbfs
         args:
             - RECIPIENT:
                 help: who to send to

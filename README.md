@@ -15,6 +15,6 @@ TODO
 ----
 
 * DONE - get clap up and running
-* DONE - add some minimal commands so we can send a chat msg
-* read chat messages - able to pick out stuff we care about (some kind of prefix?)
-
+* DONE - add some minimal commands so we can "send" a txn via kbfs
+* read txns from kbfs
+* put them in .archive after reading?
