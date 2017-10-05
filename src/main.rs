@@ -1,14 +1,20 @@
 #[macro_use]
 extern crate clap;
-use clap::App;
-use std::process::Command;
+extern crate time;
 
+use clap::App;
+use std::error::Error;
+use std::io::prelude::*;
+use std::fs::File;
+use std::path::Path;
 
 fn main() {
 	let yaml = load_yaml!("cli.yml");
 	let matches = App::from_yaml(yaml).get_matches();
 
 	if let Some(matches) = matches.subcommand_matches("send") {
+		let sender = "alt_antiochp";
+
 		let recipient = matches.value_of("RECIPIENT").unwrap();
 		println!("*** sending to - {:?}", recipient);
 
@@ -19,45 +25,53 @@ fn main() {
 			panic!("*** only allowed to send to antiochp for now... (for safety reasons...)");
 		}
 
-		let output = Command::new("keybase")
-			.arg("chat")
-			.arg("send")
-			.arg(recipient)
-			.arg(msg)
-			.output()
-			.expect("failed to run keybase");
+		write_txn(sender, recipient);
 
-		println!("{:?}", output)
+		// chat is basically a non-starter
+		// we would need to use attachments
+		// and at that point we may as well interact directly with kbfs
+		// and gain the additional flexibility of dir structure etc.
+
+		// so write a file to
+		// /keybase/private/<from>,<recipient>/grinbox_<recipient>/<timestamp>_foo_txn
+
+
+		// let output = Command::new("keybase")
+		// 	.arg("chat")
+		// 	.arg("send")
+		// 	.arg(recipient)
+		// 	.arg(msg)
+		// 	.output()
+		// 	.expect("failed to run keybase");
+
+		// println!("{:?}", output)
 	}
+}
 
+fn write_txn(sender: &str, recipient: &str) {
+	let path = format!(
+		"/keybase/private/{},{}/grinbox_{}/{}_txn.json",
+		sender, recipient, recipient, time::now_utc().strftime("%Y%m%d%H%M%S_%f").unwrap());
+	let path = Path::new(&path);
+	let display = path.display();
 
+	// Open a file in write-only mode, returns `io::Result<File>`
+	let mut file = match File::create(&path) {
+		Err(why) => panic!("couldn't create {}: {}",
+						   display,
+						   why.description()),
+		Ok(file) => file,
+	};
 
-    // // Gets a value for config if supplied by user, or defaults to "default.conf"
-    // let config = matches.value_of("config").unwrap_or("default.conf");
-    // println!("Value for config: {}", config);
-	//
-    // // Calling .unwrap() is safe here because "INPUT" is required (if "INPUT" wasn't
-    // // required we could have used an 'if let' to conditionally get the value)
-    // println!("Using input file: {}", matches.value_of("INPUT").unwrap());
-	//
-    // // Vary the output based on how many times the user used the "verbose" flag
-    // // (i.e. 'myprog -v -v -v' or 'myprog -vvv' vs 'myprog -v'
-    // match matches.occurrences_of("v") {
-    //     0 => println!("No verbose info"),
-    //     1 => println!("Some verbose info"),
-    //     2 => println!("Tons of verbose info"),
-    //     3 | _ => println!("Don't be crazy"),
-    // }
-	//
-    // // You can handle information about subcommands by requesting their matches by name
-    // // (as below), requesting just the name used, or both at the same time
-    // if let Some(matches) = matches.subcommand_matches("test") {
-    //     if matches.is_present("debug") {
-    //         println!("Printing debug info...");
-    //     } else {
-    //         println!("Printing normally...");
-    //     }
-    // }
+	// Write the `LOREM_IPSUM` string to `file`, returns `io::Result<()>`
+	match file.write_all("this is not json".as_bytes()) {
+		Err(why) => {
+			panic!("couldn't write to {}: {}", display, why.description())
+		},
+		Ok(_) => println!("successfully wrote to {}", display),
+	}
+}
 
-    // more program logic goes here...
+fn poll_for_messages() {
+
 }
